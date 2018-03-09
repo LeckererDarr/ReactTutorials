@@ -1,2 +1,0 @@
-# ReactTutorials
-react tutorials
