@@ -68,7 +68,12 @@ class Contacts extends React.Component {
                 {name: "Betty", phone: "010-0000-0002"},
                 {name: "Charlie", phone: "010-0000-0003"},
                 {name: "David", phone: "010-0000-00024"}
-            ]
+            ],
+            selectedKey: -1,
+            selected: {
+                name: "",
+                phone: ""
+            }
         };
 
         this.updateList = this.updateList.bind(this);
@@ -76,9 +81,66 @@ class Contacts extends React.Component {
         this.changeList = this.changeList.bind(this);
         this._insertContact = this._insertContact.bind(this);
     }
+    _onSelect(key){
+        console.log('스테이트 셀렉티드키',this.state.selectedKey);
+        if(key==this.state.selectedKey){
+            console.log("key select cancelled");
+            this.setState({
+                selectedKey: -1
+            });
+            return;
+        }
+
+        this.setState({
+            selectedKey: key
+        });
+        console.log(key + " is selected");
+    }
+    _isSelected(key){
+        if(this.state.selectedKey == key){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    _removeContact(){
+        if(this.state.selectedKey==-1){
+            console.log("contact not selected");
+            return;
+        }
+
+        this.setState({
+            contactData: update(
+                this.state.contactData,
+                {
+                    $splice: [[this.state.selectedKey, 1]]
+                }
+            ),
+            selectedKey: -1
+        });
+    }
 
     onInsert2(a,b){
       console.log(a,b);
+    }
+
+    _editContact(name, phone){
+        this.setState({
+            contactData: update(
+                this.state.contactData,
+                {
+                    [this.state.selectedKey]: {
+                        name: { $set: name },
+                        phone: { $set: phone }
+                    }
+                }
+            ),
+            selected: {
+                name: name,
+                phone: phone
+            }
+        });
     }
 
     render(){
@@ -98,11 +160,14 @@ class Contacts extends React.Component {
                 */
 
                   {this.state.contactData.map((contact, i) => {
-                      console.log(i);
+                      console.log(i); // isSelected={this._isSelected.bind(this)(i)
                       return (
                           <ContactInfo name={contact.name}
                                       phone={contact.phone}
-                                      key={i}/>
+                                      key={i}
+                                      contactKey={i}
+                                      isSelected={this._isSelected.bind(this)}
+                                      onSelect={this._onSelect.bind(this)}/>
                       );
                   })}
                 </ul>
@@ -110,6 +175,10 @@ class Contacts extends React.Component {
                 <button onClick={this.removeList}>스플라이스</button>
                 <button onClick={this.changeList}>체인지</button>
                 <ContactCreator onInsert={this._insertContact}/>
+                <ContactRemover onRemove={this._removeContact.bind(this)}/>
+                <ContactEditor onEdit={this._editContact.bind(this)}
+                           isSelected={(this.state.selectedKey !=-1)}
+                              contact={this.state.selected}/>
             </div>
         );
     }
@@ -118,12 +187,29 @@ class Contacts extends React.Component {
 
 class ContactInfo extends React.Component {
     handleClick(){
+        //console.log('click li');
+        console.log('클릭시 컨택트 키',this.props.contactKey);
         this.props.onSelect(this.props.contactKey);
+        //console.log(this.props.contactKey);
     }
 
     render() {
+        let getStyle = (isSelect) => {
+            if(!isSelect) return;
+
+            let style = {
+                fontWeight: 'bold',
+                backgroundColor: '#4efcd8'
+            };
+
+            return style;
+        };
+
         return(
-            <li>{this.props.name} {this.props.phone}</li>
+            <li style={getStyle(this.props.isSelected(this.props.contactKey))}
+              onClick={this.handleClick.bind(this)}>
+              {this.props.name} {this.props.phone}
+            </li>
         );
     }
 }
@@ -166,6 +252,75 @@ class ContactCreator extends React.Component {
                     <input type="text" id="phone" name="phone" placeholder="phone" value={this.state.phone} onChange={this.handleChange}/>
                     <button onClick={this.handleClick.bind(this)}>
                     Insert
+                    </button>
+                </p>
+            </div>
+        );
+    }
+}
+
+class ContactRemover extends React.Component {
+    handleClick() {
+        this.props.onRemove();
+    }
+
+    render() {
+        return (
+            <button onClick={this.handleClick.bind(this)}>
+                Remove selected contact
+            </button>
+        );
+    }
+}
+
+class ContactEditor extends React.Component {
+    constructor(props) {
+        super(props);
+        // Configure default state
+        this.state = {
+            name: "",
+            phone: ""
+        };
+    }
+    componentWillReceiveProps(nextProps){
+        this.setState({
+            name: nextProps.contact.name,
+            phone: nextProps.contact.phone
+        });
+    }
+    handleClick(){
+        if(!this.props.isSelected){
+            console.log("contact not selected");
+
+            return;
+        }
+
+        this.props.onEdit(this.state.name, this.state.phone);
+    }
+
+    handleChange(e){
+        var nextState = {};
+        nextState[e.target.name] = e.target.value;
+        this.setState(nextState);
+    }
+
+    render() {
+        return (
+            <div>
+                <p>
+                    <input type="text"
+                        name="name"
+                        placeholder="name"
+                        value={this.state.name}
+                        onChange={this.handleChange.bind(this)}/>
+
+                    <input type="text"
+                        name="phone"
+                        placeholder="phone"
+                        value={this.state.phone}
+                        onChange={this.handleChange.bind(this)}/>
+                    <button onClick={this.handleClick.bind(this)}>
+                    Edit
                     </button>
                 </p>
             </div>

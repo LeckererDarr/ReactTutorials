@@ -14,8 +14,14 @@ class RandomNumber extends React.Component {
         console.log(props);
         super(props); // 슈퍼가 없으면 디스가 안되네! React.Component를 상속받는거
         this.updateNumber = this.updateNumber.bind(this);
+        this.rmBtn = this.rmBtn.bind(this);
         console.log('랜덤넘버 생성자');
         console.log(this.props.onUpdate);
+    }
+
+    rmBtn(e){
+      console.log(e.currentTarget.style);
+      e.currentTarget.remove();
     }
 
     render(){
@@ -23,6 +29,7 @@ class RandomNumber extends React.Component {
             <div>
                 <h1>RANDOM NUMBER: { this.props.number }</h1>
                 <button onClick={this.updateNumber}>Randomize</button>
+                <button onClick={this.rmBtn}>asdf</button>
             </div>
         );
     }
