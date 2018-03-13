@@ -5,6 +5,7 @@ import RandomNumber from './RandomNumber';
 import Contacts from './Contacts';
 import ContactInfo from './Contacts';
 import Test from './Test';
+import Test2 from './Test2';
 // http://twinw.tistory.com/184 node 업그레이드
 //
 
@@ -17,16 +18,34 @@ class App extends React.Component {
         });
     }
 
+    updateLabel(newLabel){
+      console.log(newLabel);
+      this.setState({
+        test2:newLabel
+      })
+    }
+
     constructor(props){
 
         super(props); // 슈퍼가 없으면 디스가 안되네! React.Component를 상속받는거
         console.log(props);
 
         this.state = {
-            value: Math.round(Math.random()*100)
+            value: Math.round(Math.random()*100),
+            test2:'첫번째'
         };
         console.log('앱 생성자');
         this.updateValue = this.updateValue.bind(this);
+        this.updateLabel = this.updateLabel.bind(this);
+    }
+
+    shouldComponentUpdate(nextProps, nextState){
+      console.log('.5');
+      return true;
+    }
+
+    componentWillUpdate(nextProps, nextState){
+      console.log('.6');
     }
 
     render(){
@@ -45,6 +64,8 @@ class App extends React.Component {
                         onUpdate2={this.updateValue} />
               <Contacts />
               <Test t_arr={t_arr}/>
+              <Test2 label={this.state.test2}
+                      onUpdate3={this.updateLabel}/>
             </div>
         );
     }

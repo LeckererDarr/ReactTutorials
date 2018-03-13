@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 class RandomNumber extends React.Component {
     updateNumber(){
         console.log('업데이트넘버');
+        console.log(this);
         let value = Math.round(Math.random()*100);
         console.log('업데이트넘버에서 만든 숫자'+value);
         this.props.onUpdate2(value);
