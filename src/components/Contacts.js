@@ -86,13 +86,18 @@ class Contacts extends React.Component {
         if(key==this.state.selectedKey){
             console.log("key select cancelled");
             this.setState({
-                selectedKey: -1
+                selectedKey: -1,
+                selected: {
+                    name: "",
+                    phone: ""
+                }
             });
             return;
         }
 
         this.setState({
-            selectedKey: key
+            selectedKey: key,
+            selected: this.state.contactData[key]
         });
         console.log(key + " is selected");
     }
@@ -192,8 +197,11 @@ class ContactInfo extends React.Component {
         this.props.onSelect(this.props.contactKey);
         //console.log(this.props.contactKey);
     }
-
+    shouldComponentUpdate(nextProps, nextState){
+    	return (JSON.stringify(nextProps) != JSON.stringify(this.props));	
+    }
     render() {
+      console.log("rendered: " + this.props.name);
         let getStyle = (isSelect) => {
             if(!isSelect) return;
 
@@ -281,12 +289,14 @@ class ContactEditor extends React.Component {
             name: "",
             phone: ""
         };
+        console.log('컨텍에딧 생성자')
     }
     componentWillReceiveProps(nextProps){
         this.setState({
             name: nextProps.contact.name,
             phone: nextProps.contact.phone
         });
+        console.log('컨텍에딧 리시즈');
     }
     handleClick(){
         if(!this.props.isSelected){
@@ -301,7 +311,9 @@ class ContactEditor extends React.Component {
     handleChange(e){
         var nextState = {};
         nextState[e.target.name] = e.target.value;
+        console.log(nextState);
         this.setState(nextState);
+        console.log(this.state);
     }
 
     render() {
