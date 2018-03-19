@@ -198,7 +198,9 @@ class ContactInfo extends React.Component {
         //console.log(this.props.contactKey);
     }
     shouldComponentUpdate(nextProps, nextState){
-    	return (JSON.stringify(nextProps) != JSON.stringify(this.props));	
+      console.log(this.props);
+      console.log(nextProps);
+    	return (JSON.stringify(nextProps) != JSON.stringify(this.props));
     }
     render() {
       console.log("rendered: " + this.props.name);
